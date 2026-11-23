@@ -2,33 +2,27 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/components/CartProvider";
-import { products, formatPrice } from "@/lib/products";
+import { products, formatPrice, PHONE } from "@/lib/products";
+import { openMail } from "@/lib/send";
 
 export default function CartPage() {
-  const { items, setQty, clear } = useCart();
+  const { items, setQty } = useCart();
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [status, setStatus] = useState("");
 
   const lines = items.map((i) => ({ ...products.find((p) => p.id === i.id), qty: i.qty })).filter((l) => l.name);
   const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
 
-  async function order(e) {
+  function order(e) {
     e.preventDefault();
-    setStatus("Envoi...");
     const message =
+      `Nom : ${form.name}\nTelephone : ${form.phone}\nAdresse : ${form.address}\n\n` +
       lines.map((l) => `${l.qty} x ${l.name} (${formatPrice(l.price)})`).join("\n") +
-      `\n\nTotal : ${formatPrice(total)}\nAdresse : ${form.address}`;
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, phone: form.phone, subject: "Nouvelle commande", message }),
-      });
-      if (!res.ok) throw new Error();
-      setStatus("Commande envoyee ! Nous vous appelons bientot.");
-      clear();
-    } catch {
-      setStatus("Erreur d'envoi. Appelez-nous au 0522364759.");
+      `\n\nTotal : ${formatPrice(total)}`;
+    if (openMail("Nouvelle commande", message)) {
+      setStatus("Votre messagerie s'ouvre : envoyez l'e-mail pour confirmer la commande.");
+    } else {
+      setStatus(`Merci ! Appelez-nous au ${PHONE} pour confirmer votre commande de ${formatPrice(total)}.`);
     }
   }
 

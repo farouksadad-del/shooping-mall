@@ -1,25 +1,19 @@
 "use client";
 import { useState } from "react";
 import { PHONE, PHONE_HREF } from "@/lib/products";
+import { openMail } from "@/lib/send";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", phone: "", message: "" });
   const [status, setStatus] = useState("");
 
-  async function submit(e) {
+  function submit(e) {
     e.preventDefault();
-    setStatus("Envoi...");
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, subject: "Message du site" }),
-      });
-      if (!res.ok) throw new Error();
-      setStatus("Message envoye, merci !");
-      setForm({ name: "", phone: "", message: "" });
-    } catch {
-      setStatus("Erreur d'envoi. Appelez-nous au " + PHONE);
+    const body = `Nom : ${form.name}\nTelephone : ${form.phone || "-"}\n\n${form.message}`;
+    if (openMail("Message du site Shooping Mall", body)) {
+      setStatus("Votre messagerie s'ouvre : envoyez l'e-mail pour nous joindre.");
+    } else {
+      setStatus("Merci ! Pour une reponse rapide, appelez-nous au " + PHONE);
     }
   }
 

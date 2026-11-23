@@ -1,16 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProductCard from "./ProductCard";
 import { products, categories } from "@/lib/products";
 
-export default function ProductsGrid({ initial = "Tous" }) {
-  const [cat, setCat] = useState(categories.includes(initial) ? initial : "Tous");
+export default function ProductsGrid() {
+  const router = useRouter();
+  const param = useSearchParams().get("cat");
+  const cat = categories.includes(param) ? param : "Tous";
   const list = cat === "Tous" ? products : products.filter((p) => p.category === cat);
+  const select = (c) => router.replace(c === "Tous" ? "/products/" : `/products/?cat=${c}`, { scroll: false });
   return (
     <>
       <div className="filters">
         {categories.map((c) => (
-          <button key={c} className={`btn ${c === cat ? "btn-yellow" : "btn-outline-light"}`} onClick={() => setCat(c)}>
+          <button key={c} className={`btn ${c === cat ? "btn-yellow" : "btn-outline-light"}`} onClick={() => select(c)}>
             {c}
           </button>
         ))}
