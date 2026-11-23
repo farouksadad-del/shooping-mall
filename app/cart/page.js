@@ -2,27 +2,31 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/components/CartProvider";
-import { products, formatPrice, PHONE } from "@/lib/products";
-import { openMail } from "@/lib/send";
+import { products, formatPrice, img } from "@/lib/products";
+import { sendForm } from "@/lib/send";
 
 export default function CartPage() {
-  const { items, setQty } = useCart();
+  const { items, setQty, clear } = useCart();
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [status, setStatus] = useState("");
+  const [sending, setSending] = useState(false);
 
   const lines = items.map((i) => ({ ...products.find((p) => p.id === i.id), qty: i.qty })).filter((l) => l.name);
   const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
 
-  function order(e) {
+  async function order(e) {
     e.preventDefault();
+    setSending(true);
     const message =
-      `Nom : ${form.name}\nTelephone : ${form.phone}\nAdresse : ${form.address}\n\n` +
       lines.map((l) => `${l.qty} x ${l.name} (${formatPrice(l.price)})`).join("\n") +
-      `\n\nTotal : ${formatPrice(total)}`;
-    if (openMail("Nouvelle commande", message)) {
-      setStatus("Votre messagerie s'ouvre : envoyez l'e-mail pour confirmer la commande.");
+      `\n\nTotal : ${formatPrice(total)}\nAdresse : ${form.address}`;
+    const via = await sendForm({ name: form.name, phone: form.phone, subject: "Nouvelle commande", message });
+    setSending(false);
+    if (via === "email") {
+      setStatus("Commande envoyee ! Nous vous appelons tres vite pour confirmer.");
+      clear();
     } else {
-      setStatus(`Merci ! Appelez-nous au ${PHONE} pour confirmer votre commande de ${formatPrice(total)}.`);
+      setStatus("WhatsApp s'est ouvert avec votre commande : appuyez sur Envoyer pour la confirmer.");
     }
   }
 
@@ -36,11 +40,12 @@ export default function CartPage() {
           <div>
             {lines.map((l) => (
               <div key={l.id} className="cart-line">
-                <span>{l.name}</span>
+                <img src={img(l.image)} alt="" className="cart-thumb" />
+                <span className="cart-name">{l.name}</span>
                 <span className="qty">
-                  <button onClick={() => setQty(l.id, l.qty - 1)}>−</button>
+                  <button onClick={() => setQty(l.id, l.qty - 1)} aria-label="Moins">−</button>
                   {l.qty}
-                  <button onClick={() => setQty(l.id, l.qty + 1)}>+</button>
+                  <button onClick={() => setQty(l.id, l.qty + 1)} aria-label="Plus">+</button>
                 </span>
                 <strong>{formatPrice(l.price * l.qty)}</strong>
               </div>
@@ -52,12 +57,12 @@ export default function CartPage() {
             <input required placeholder="Nom complet" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <input required placeholder="Telephone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             <textarea required placeholder="Adresse de livraison" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-            <button className="btn btn-yellow" type="submit">Confirmer la commande</button>
-            {status && <p className="status">{status}</p>}
+            <button className="btn btn-yellow" type="submit" disabled={sending}>{sending ? "Envoi..." : "Confirmer la commande"}</button>
+            <small className="muted">Paiement a la livraison.</small>
           </form>
         </div>
       )}
-      {lines.length === 0 && status && <p className="status">{status}</p>}
+      {status && <p className="status">{status}</p>}
     </section>
   );
 }

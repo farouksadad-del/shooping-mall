@@ -1,7 +1,7 @@
 import Link from "next/link";
 import WatchSVG from "@/components/WatchSVG";
 import ProductCard from "@/components/ProductCard";
-import { products, PHONE, PHONE_HREF } from "@/lib/products";
+import { products, PHONE, PHONE_HREF, WHATSAPP_URL, img } from "@/lib/products";
 
 export default function Home() {
   return (
@@ -27,13 +27,17 @@ export default function Home() {
 
         <div className="hero-bottom">
           <div className="tile tile-yellow">
-            <span className="chip">▶ Video</span>
-            <strong>A propos<br />de Shooping Mall</strong>
+            <img src={img("gold-classic.jpg")} alt="" className="tile-photo" />
+            <span className="chip">★ Nouveaute</span>
+            <strong>Gold<br />Classic</strong>
           </div>
           <div className="tile tile-dark">
             <span className="chip chip-lime">Depuis 2021</span>
             <p>Nos conseillers vous aident a trouver la montre parfaite.</p>
-            <a href={PHONE_HREF} className="btn btn-yellow">Appeler {PHONE}</a>
+            <div className="row">
+              <a href={PHONE_HREF} className="btn btn-yellow">Appeler {PHONE}</a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp">WhatsApp</a>
+            </div>
           </div>
           <div className="rating">
             <i>4.9</i>

@@ -1,7 +1,6 @@
 "use client";
-import WatchSVG from "./WatchSVG";
 import { useCart } from "./CartProvider";
-import { formatPrice } from "@/lib/products";
+import { formatPrice, img } from "@/lib/products";
 
 export default function ProductCard({ p }) {
   const { add } = useCart();
@@ -9,7 +8,7 @@ export default function ProductCard({ p }) {
     <article className="card">
       <div className="card-img">
         <span className="tag">{p.category}</span>
-        <WatchSVG caseColor={p.case} dial={p.dial} accent={p.accent} strap={p.strap} size={150} />
+        <img src={img(p.image)} alt={`Montre ${p.name}`} loading="lazy" />
       </div>
       <div className="card-body">
         <h3>{p.name}</h3>

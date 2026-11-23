@@ -69,7 +69,20 @@ em, i { font-family: Georgia, "Times New Roman", serif; font-style: italic; font
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; }
 .card { background: var(--black2); border: 1px solid #262626; border-radius: 20px; overflow: hidden; transition: transform .2s, border-color .2s; }
 .card:hover { transform: translateY(-6px); border-color: var(--yellow); }
-.card-img { position: relative; display: flex; justify-content: center; padding: 28px 0 10px; background: radial-gradient(circle, #2a2410, #151515 70%); }
+.card-img { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #1a1a1a; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.card:hover .card-img img { transform: scale(1.06); }
+.tag { z-index: 1; }
+.tile-photo { position: absolute; right: 0; top: 0; width: 55%; height: 100%; object-fit: cover; }
+.tile-yellow strong, .tile-yellow .chip { position: relative; z-index: 1; }
+.tile-dark .row { justify-content: center; }
+.btn-whatsapp { background: #25d366; color: #fff; }
+.wa-float { position: fixed; right: 20px; bottom: 20px; z-index: 50; width: 58px; height: 58px; border-radius: 50%; background: #25d366; display: grid; place-items: center; box-shadow: 0 10px 25px rgba(0,0,0,.5); transition: transform .15s; }
+.wa-float:hover { transform: scale(1.08); }
+.cart-thumb { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; }
+.cart-name { flex: 1; }
+.muted { color: #888; }
+.contact-ways { display: flex; flex-wrap: wrap; gap: 12px; }
 .tag { position: absolute; top: 14px; left: 14px; background: var(--yellow); color: #000; font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
 .card-body { padding: 18px; }
 .card-body h3 { font-size: 1.1rem; }

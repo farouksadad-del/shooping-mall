@@ -1,31 +1,38 @@
 "use client";
 import { useState } from "react";
-import { PHONE, PHONE_HREF } from "@/lib/products";
-import { openMail } from "@/lib/send";
+import { PHONE, PHONE_HREF, WHATSAPP_URL } from "@/lib/products";
+import { sendForm } from "@/lib/send";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", phone: "", message: "" });
   const [status, setStatus] = useState("");
+  const [sending, setSending] = useState(false);
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    const body = `Nom : ${form.name}\nTelephone : ${form.phone || "-"}\n\n${form.message}`;
-    if (openMail("Message du site Shooping Mall", body)) {
-      setStatus("Votre messagerie s'ouvre : envoyez l'e-mail pour nous joindre.");
+    setSending(true);
+    const via = await sendForm({ ...form, subject: "Message du site" });
+    setSending(false);
+    if (via === "email") {
+      setStatus("Message envoye, merci ! Nous vous repondons rapidement.");
+      setForm({ name: "", phone: "", message: "" });
     } else {
-      setStatus("Merci ! Pour une reponse rapide, appelez-nous au " + PHONE);
+      setStatus("WhatsApp s'est ouvert avec votre message : appuyez sur Envoyer.");
     }
   }
 
   return (
     <section className="section">
       <h1 className="h2">Contactez-<em>nous</em></h1>
-      <p>Telephone : <a className="link" href={PHONE_HREF}>{PHONE}</a></p>
+      <div className="contact-ways">
+        <a className="btn btn-yellow" href={PHONE_HREF}>Appeler {PHONE}</a>
+        <a className="btn btn-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">WhatsApp {PHONE}</a>
+      </div>
       <form onSubmit={submit} className="form narrow">
         <input required placeholder="Nom" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <input placeholder="Telephone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         <textarea required placeholder="Votre message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-        <button className="btn btn-yellow" type="submit">Envoyer</button>
+        <button className="btn btn-yellow" type="submit" disabled={sending}>{sending ? "Envoi..." : "Envoyer"}</button>
         {status && <p className="status">{status}</p>}
       </form>
     </section>
