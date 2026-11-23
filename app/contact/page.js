@@ -4,7 +4,7 @@ import { PHONE, PHONE_HREF, WHATSAPP_URL } from "@/lib/products";
 import { sendForm } from "@/lib/send";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", phone: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -14,8 +14,8 @@ export default function ContactPage() {
     const via = await sendForm({ ...form, subject: "Message du site" });
     setSending(false);
     if (via === "email") {
-      setStatus("Message envoye, merci ! Nous vous repondons rapidement.");
-      setForm({ name: "", phone: "", message: "" });
+      setStatus("Message envoye, merci ! Un e-mail de confirmation vous a ete envoye.");
+      setForm({ name: "", email: "", phone: "", message: "" });
     } else {
       setStatus("WhatsApp s'est ouvert avec votre message : appuyez sur Envoyer.");
     }
@@ -30,6 +30,7 @@ export default function ContactPage() {
       </div>
       <form onSubmit={submit} className="form narrow">
         <input required placeholder="Nom" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <input required type="email" placeholder="Votre e-mail" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <input placeholder="Telephone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         <textarea required placeholder="Votre message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
         <button className="btn btn-yellow" type="submit" disabled={sending}>{sending ? "Envoi..." : "Envoyer"}</button>

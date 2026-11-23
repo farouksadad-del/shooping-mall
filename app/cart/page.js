@@ -7,7 +7,7 @@ import { sendForm } from "@/lib/send";
 
 export default function CartPage() {
   const { items, setQty, clear } = useCart();
-  const [form, setForm] = useState({ name: "", phone: "", address: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -20,10 +20,10 @@ export default function CartPage() {
     const message =
       lines.map((l) => `${l.qty} x ${l.name} (${formatPrice(l.price)})`).join("\n") +
       `\n\nTotal : ${formatPrice(total)}\nAdresse : ${form.address}`;
-    const via = await sendForm({ name: form.name, phone: form.phone, subject: "Nouvelle commande", message });
+    const via = await sendForm({ name: form.name, email: form.email, phone: form.phone, subject: "Nouvelle commande", message });
     setSending(false);
     if (via === "email") {
-      setStatus("Commande envoyee ! Nous vous appelons tres vite pour confirmer.");
+      setStatus("Commande envoyee ! Un e-mail de confirmation vous a ete envoye.");
       clear();
     } else {
       setStatus("WhatsApp s'est ouvert avec votre commande : appuyez sur Envoyer pour la confirmer.");
@@ -55,6 +55,7 @@ export default function CartPage() {
           <form onSubmit={order} className="form">
             <h3>Passer la commande</h3>
             <input required placeholder="Nom complet" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <input required type="email" placeholder="Votre e-mail" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             <input required placeholder="Telephone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             <textarea required placeholder="Adresse de livraison" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
             <button className="btn btn-yellow" type="submit" disabled={sending}>{sending ? "Envoi..." : "Confirmer la commande"}</button>
