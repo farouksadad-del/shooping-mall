@@ -1,0 +1,39 @@
+"use client";
+import { useState } from "react";
+import { PHONE, PHONE_HREF } from "@/lib/products";
+
+export default function ContactPage() {
+  const [form, setForm] = useState({ name: "", phone: "", message: "" });
+  const [status, setStatus] = useState("");
+
+  async function submit(e) {
+    e.preventDefault();
+    setStatus("Envoi...");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, subject: "Message du site" }),
+      });
+      if (!res.ok) throw new Error();
+      setStatus("Message envoye, merci !");
+      setForm({ name: "", phone: "", message: "" });
+    } catch {
+      setStatus("Erreur d'envoi. Appelez-nous au " + PHONE);
+    }
+  }
+
+  return (
+    <section className="section">
+      <h1 className="h2">Contactez-<em>nous</em></h1>
+      <p>Telephone : <a className="link" href={PHONE_HREF}>{PHONE}</a></p>
+      <form onSubmit={submit} className="form narrow">
+        <input required placeholder="Nom" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <input placeholder="Telephone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        <textarea required placeholder="Votre message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
+        <button className="btn btn-yellow" type="submit">Envoyer</button>
+        {status && <p className="status">{status}</p>}
+      </form>
+    </section>
+  );
+}
